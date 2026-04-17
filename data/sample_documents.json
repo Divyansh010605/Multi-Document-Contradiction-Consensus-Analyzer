@@ -1,0 +1,16 @@
+{
+  "documents": [
+    {
+      "source": "Medical News A",
+      "text": "The new drug reduces symptoms in most patients. Researchers observed improved recovery time."
+    },
+    {
+      "source": "Clinical Trial B",
+      "text": "The new drug does not reduce symptoms in randomized clinical trials. Recovery time was unchanged."
+    },
+    {
+      "source": "Journal Paper C",
+      "text": "A meta-analysis reports the new drug reduces symptoms by 30 percent. The drug improves outcomes for treated groups."
+    }
+  ]
+}
