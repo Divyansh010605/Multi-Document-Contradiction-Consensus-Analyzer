@@ -6,6 +6,9 @@ from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
+from app.pipeline.graph import ClaimGraph
+from app.pipeline.nli import ClaimRelation
+
 
 class DocumentInput(BaseModel):
     """Single input document payload."""
@@ -44,5 +47,5 @@ class StatsOutput(BaseModel):
 class AnalyzeResponse(BaseModel):
     stats: StatsOutput
     claims: List[ClaimOutput]
-    relations: List[Dict]
-    graph: Dict
+    relations: List[ClaimRelation]
+    graph: ClaimGraph

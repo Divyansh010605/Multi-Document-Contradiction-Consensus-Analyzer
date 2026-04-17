@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
@@ -23,18 +23,25 @@ def embed_claims(claims: List[Claim]) -> Tuple[np.ndarray, np.ndarray]:
     return vectors, similarity
 
 
-def cluster_claims(claims: List[Claim], similarity_threshold: float = 0.35) -> Dict[str, int]:
+def cluster_claims(
+    claims: List[Claim],
+    similarity_threshold: float = 0.35,
+    *,
+    vectors: Optional[np.ndarray] = None,
+) -> Dict[str, int]:
     """
     Cluster semantically similar claims.
 
     Lower thresholds produce larger clusters. Output maps claim_id -> cluster_id.
+    Pass ``vectors`` from a single :func:`embed_claims` call to avoid recomputing TF-IDF.
     """
     if not claims:
         return {}
     if len(claims) == 1:
         return {claims[0].claim_id: 0}
 
-    vectors, _ = embed_claims(claims)
+    if vectors is None:
+        vectors, _ = embed_claims(claims)
     if vectors.size == 0:
         return {claim.claim_id: idx for idx, claim in enumerate(claims)}
 
@@ -48,9 +55,15 @@ def cluster_claims(claims: List[Claim], similarity_threshold: float = 0.35) -> D
     return {claim.claim_id: int(label) for claim, label in zip(claims, labels)}
 
 
-def cluster_cohesion(claims: List[Claim], cluster_map: Dict[str, int]) -> Dict[int, float]:
+def cluster_cohesion(
+    claims: List[Claim],
+    cluster_map: Dict[str, int],
+    *,
+    similarity: Optional[np.ndarray] = None,
+) -> Dict[int, float]:
     """Estimate cohesion score for each cluster from average similarity."""
-    _, similarity = embed_claims(claims)
+    if similarity is None:
+        _, similarity = embed_claims(claims)
     if similarity.size == 0:
         return {}
 

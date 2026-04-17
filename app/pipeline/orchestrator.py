@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import Dict, List
 
 from app.pipeline.claims import Claim, extract_claims
-from app.pipeline.cluster import cluster_claims, cluster_cohesion
+from app.pipeline.cluster import cluster_claims, cluster_cohesion, embed_claims
 from app.pipeline.graph import build_claim_graph
 from app.pipeline.ingest import InputDocument, segment_sentences
 from app.pipeline.nli import ClaimRelation, infer_relations
@@ -36,9 +36,10 @@ def analyze_documents(documents: List[InputDocument]) -> Dict:
     """Run full analysis pipeline and return structured output."""
     sentences = segment_sentences(documents)
     claims = extract_claims(sentences)
-    cluster_map = cluster_claims(claims)
-    cohesion = cluster_cohesion(claims, cluster_map)
-    relations = infer_relations(claims, cluster_map)
+    vectors, similarity = embed_claims(claims)
+    cluster_map = cluster_claims(claims, vectors=vectors)
+    cohesion = cluster_cohesion(claims, cluster_map, similarity=similarity)
+    relations = infer_relations(claims, cluster_map, similarity=similarity)
     graph = build_claim_graph(claims, cluster_map, relations)
     score_map = score_claims(claims, relations, cluster_map, cohesion)
     snippets = _group_supporting_and_contradicting_snippets(claims, relations)

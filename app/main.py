@@ -17,6 +17,8 @@ from app.pipeline.orchestrator import analyze_documents
 from app.schemas import AnalyzeRequest, AnalyzeResponse
 
 APP_TITLE = os.getenv("APP_TITLE", "Multi-Document Contradiction and Consensus Analyzer")
+UPLOAD_MAX_BYTES = int(os.getenv("UPLOAD_MAX_BYTES", str(10 * 1024 * 1024)))
+UPLOAD_MAX_FILES = int(os.getenv("UPLOAD_MAX_FILES", "25"))
 
 app = FastAPI(title=APP_TITLE, version="0.1.0")
 app.add_middleware(
@@ -70,10 +72,15 @@ async def upload_documents(files: List[UploadFile] = File(...)) -> dict:
     """Parse uploaded documents and return extracted text payloads."""
     if not files:
         raise HTTPException(status_code=400, detail="No files uploaded.")
+    if len(files) > UPLOAD_MAX_FILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Too many files ({len(files)}). Maximum allowed is {UPLOAD_MAX_FILES}.",
+        )
 
     parsed = []
     for file in files:
-        parsed_file = await parse_uploaded_file(file)
+        parsed_file = await parse_uploaded_file(file, max_bytes=UPLOAD_MAX_BYTES)
         parsed.append(parsed_file.model_dump())
 
     return {"documents": parsed, "count": len(parsed)}

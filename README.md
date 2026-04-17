@@ -77,9 +77,12 @@ Request body:
 ```json
 {
   "documents": [
-    { "source": "Medical News A", "text": "The drug reduces symptoms." },
-    { "source": "Clinical Trial B", "text": "The drug does not reduce symptoms." },
-    { "source": "Journal C", "text": "Researchers found reduced symptoms." }
+    {
+      "source": "Source A",
+      "text": "The vaccine reduces severe disease in adults. Clinical studies confirm the vaccine reduces severe disease in adult participants."
+    },
+    { "source": "Source B", "text": "The policy reduces national emissions by 20 percent." },
+    { "source": "Source C", "text": "The policy does not reduce national emissions by 20 percent." }
   ]
 }
 ```

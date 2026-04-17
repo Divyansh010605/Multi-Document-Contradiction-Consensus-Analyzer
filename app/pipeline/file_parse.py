@@ -20,6 +20,23 @@ class ParsedUpload(BaseModel):
     text: str
 
 
+async def read_upload_file_bytes(file: UploadFile, max_bytes: int) -> bytes:
+    """Read upload body in chunks; reject when total size exceeds ``max_bytes``."""
+    buf = bytearray()
+    while len(buf) <= max_bytes:
+        chunk = await file.read(65536)
+        if not chunk:
+            break
+        buf.extend(chunk)
+        if len(buf) > max_bytes:
+            name = file.filename or "upload"
+            raise HTTPException(
+                status_code=413,
+                detail=f"{name}: exceeds maximum size of {max_bytes} bytes.",
+            )
+    return bytes(buf)
+
+
 def _normalize_source(filename: str) -> str:
     stem = Path(filename).stem.strip()
     return stem or "Uploaded Source"
@@ -59,11 +76,11 @@ def _parse_docx(raw_bytes: bytes) -> str:
     return "\n".join(paragraphs).strip()
 
 
-async def parse_uploaded_file(file: UploadFile) -> ParsedUpload:
+async def parse_uploaded_file(file: UploadFile, *, max_bytes: int) -> ParsedUpload:
     """Parse a supported uploaded file and return normalized text."""
     filename = file.filename or "uploaded_document"
     extension = Path(filename).suffix.lower()
-    raw_bytes = await file.read()
+    raw_bytes = await read_upload_file_bytes(file, max_bytes)
 
     if not raw_bytes:
         raise HTTPException(status_code=400, detail=f"{filename}: file is empty.")

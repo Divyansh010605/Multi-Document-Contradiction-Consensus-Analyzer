@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
+
+import numpy as np
 
 from pydantic import BaseModel
 from app.pipeline.claims import Claim
@@ -44,7 +46,12 @@ def _numeric_conflict(a: str, b: str) -> bool:
     return bool(a_nums and b_nums and a_nums != b_nums)
 
 
-def infer_relations(claims: List[Claim], cluster_map: Dict[str, int]) -> List[ClaimRelation]:
+def infer_relations(
+    claims: List[Claim],
+    cluster_map: Dict[str, int],
+    *,
+    similarity: Optional[np.ndarray] = None,
+) -> List[ClaimRelation]:
     """
     Infer pairwise relationships within each cluster.
 
@@ -52,11 +59,15 @@ def infer_relations(claims: List[Claim], cluster_map: Dict[str, int]) -> List[Cl
     - high lexical similarity + no conflict => entailment
     - high lexical similarity + negation/number conflict => contradiction
     - otherwise neutral
+
+    Pass ``similarity`` from a single :func:`embed_claims` call to avoid recomputing TF-IDF.
     """
     if len(claims) < 2:
         return []
 
-    _, sim = embed_claims(claims)
+    if similarity is None:
+        _, similarity = embed_claims(claims)
+    sim = similarity
     if sim.size == 0:
         return []
 
@@ -68,19 +79,19 @@ def infer_relations(claims: List[Claim], cluster_map: Dict[str, int]) -> List[Cl
             if cluster_map.get(claim_a.claim_id) != cluster_map.get(claim_b.claim_id):
                 continue
 
-            similarity = float(sim[i, j])
+            pair_similarity = float(sim[i, j])
             contradiction = _negation_mismatch(claim_a.text, claim_b.text) or _numeric_conflict(
                 claim_a.text, claim_b.text
             )
-            if similarity >= 0.55 and contradiction:
+            if pair_similarity >= 0.55 and contradiction:
                 label: Label = "contradiction"
-                confidence = min(1.0, 0.6 + similarity * 0.35)
-            elif similarity >= 0.5:
+                confidence = min(1.0, 0.6 + pair_similarity * 0.35)
+            elif pair_similarity >= 0.5:
                 label = "entailment"
-                confidence = min(1.0, 0.5 + similarity * 0.45)
+                confidence = min(1.0, 0.5 + pair_similarity * 0.45)
             else:
                 label = "neutral"
-                confidence = max(0.1, 1.0 - similarity)
+                confidence = max(0.1, 1.0 - pair_similarity)
 
             relations.append(
                 ClaimRelation(

@@ -265,9 +265,12 @@
 
     function initDefaults() {
       docsContainer.innerHTML = "";
-      addDocumentCard("Source A", "The new drug reduces symptoms in most patients.");
-      addDocumentCard("Source B", "The new drug does not reduce symptoms in clinical trials.");
-      addDocumentCard("Source C", "Researchers report the new drug reduces symptoms by 30%.");
+      addDocumentCard(
+        "Source A",
+        "The vaccine reduces severe disease in adults. Clinical studies confirm the vaccine reduces severe disease in adult participants."
+      );
+      addDocumentCard("Source B", "The policy reduces national emissions by 20 percent.");
+      addDocumentCard("Source C", "The policy does not reduce national emissions by 20 percent.");
     }
 
     async function uploadAndParseFiles(fileList) {
