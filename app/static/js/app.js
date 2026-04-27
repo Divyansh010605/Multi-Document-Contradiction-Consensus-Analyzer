@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const addDocBtn = document.getElementById("addDoc");
     const analyzeBtn = document.getElementById("analyzeBtn");
     const dropzone = document.getElementById("dropzone");
+    const mainElement = document.querySelector("main");
+    const resultsPanel = document.getElementById("resultsPanel");
 
     // Add icons to buttons
     addDocBtn.innerHTML = `${Icons.PLUS} Add Document`;
@@ -189,6 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
         statsDiv.innerHTML = "";
         relationsSummaryDiv.innerHTML = "";
         claimsDiv.innerHTML = "";
+        resultsPanel.classList.remove("visible");
+        mainElement.classList.remove("has-results");
     });
 
     analyzeBtn.addEventListener("click", async () => {
@@ -203,8 +207,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Show results panel and switch layout
+        resultsPanel.classList.add("visible");
+        mainElement.classList.add("has-results");
+
         // Show loading state
-        const resultsPanel = claimsDiv.closest('.panel');
         const overlay = document.createElement('div');
         overlay.className = 'loading-overlay';
         overlay.innerHTML = `<div class="spinner"></div><p>Analyzing cross-document relationships...</p>`;
