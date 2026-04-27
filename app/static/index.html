@@ -1,440 +1,88 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contradiction & Consensus Analyzer</title>
-  <style>
-    :root {
-      --bg: #f7f8fc;
-      --card: #ffffff;
-      --line: #e3e7f1;
-      --text: #1b2430;
-      --muted: #566074;
-      --primary: #3255f5;
-      --primary-dark: #2543c2;
-      --danger-bg: #fdebec;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.4;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 22px 18px 34px;
-    }
-    .hero, .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 4px 16px rgba(18, 26, 40, 0.04);
-    }
-    .hero { margin-bottom: 14px; }
-    .hero h1 { margin: 0 0 8px; font-size: 1.35rem; }
-    .subtitle { color: var(--muted); margin: 0; }
-    .toolbar { display: flex; gap: 10px; margin: 12px 0 10px; flex-wrap: wrap; }
-    button {
-      border: 1px solid transparent;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-secondary { border-color: var(--line); background: #fff; color: var(--text); }
-    .helper { font-size: 0.86rem; color: var(--muted); margin-bottom: 10px; }
-    .dropzone {
-      border: 2px dashed #c8d3f2;
-      border-radius: 12px;
-      background: #f9fbff;
-      color: #445069;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 12px;
-      transition: border-color 0.15s ease, background 0.15s ease;
-    }
-    .dropzone.active {
-      border-color: #4f71ff;
-      background: #edf2ff;
-      color: #203794;
-    }
-    .doc {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
-      background: #fff;
-    }
-    .doc-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin: 6px 0 4px;
-    }
-    input[type="text"], textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px;
-      font: inherit;
-      background: #fff;
-    }
-    textarea { min-height: 110px; resize: vertical; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 8px;
-      margin: 12px 0;
-    }
-    .stat { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 10px; }
-    .stat .k { font-size: 0.78rem; color: var(--muted); }
-    .stat .v { font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
-    .relation-summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-    .badge { border-radius: 999px; padding: 5px 10px; font-size: 0.82rem; font-weight: 600; }
-    .badge-ent { background: #ebf0ff; color: #213cba; }
-    .badge-con { background: var(--danger-bg); color: #972239; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-    .claim { border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 12px; }
-    .claim-text { margin: 0 0 8px; font-weight: 600; }
-    .meta { font-size: 0.84rem; color: var(--muted); margin: 3px 0; }
-    .bar {
-      width: 100%;
-      height: 8px;
-      border-radius: 999px;
-      background: #e9edf7;
-      overflow: hidden;
-      margin: 8px 0 10px;
-    }
-    .fill { height: 8px; background: linear-gradient(90deg, #2f68ff, #58b0ff); }
-    details { margin-top: 8px; }
-    summary { cursor: pointer; font-size: 0.88rem; }
-    ul { margin: 8px 0 0 16px; padding: 0; font-size: 0.84rem; color: #344055; }
-    .empty { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
-    .error {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: var(--danger-bg);
-      color: #8b2135;
-      border: 1px solid #f4c7cf;
-      font-size: 0.9rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyzer | Multi-Document Contradiction & Consensus</title>
+    
+    <!-- SEO & Meta -->
+    <meta name="description" content="Advanced AI tool for analyzing contradictions and consensus across multiple documents. Extract insights and verify claims automatically.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <div class="container">
-    <section class="hero">
-      <h1>Multi-Document Contradiction & Consensus Analyzer</h1>
-      <p class="subtitle">Add at least 3 documents, run analysis, and inspect agreements, contradictions, and confidence.</p>
-    </section>
+    <div class="container">
+        <header>
+            <h1>InsightStream</h1>
+            <p class="subtitle">Intelligent Cross-Document Analysis for Contradiction Discovery and Consensus Mapping.</p>
+        </header>
 
-    <section class="panel">
-      <div class="toolbar">
-        <button id="addDoc" type="button" class="btn-secondary">+ Add Document</button>
-        <button id="uploadDocsBtn" type="button" class="btn-secondary">Upload Documents</button>
-        <button id="resetDocsBtn" type="button" class="btn-secondary">Reset Sample</button>
-        <button id="analyzeBtn" type="button" class="btn-primary">Analyze Documents</button>
-      </div>
-      <p class="helper">Type manually, use upload button, or drag and drop files. Supported: <strong>.txt / .md / .json / .pdf / .docx</strong>.</p>
-      <div id="dropzone" class="dropzone">Drag and drop files here, or click "Upload Documents"</div>
-      <input id="uploadDocsInput" type="file" accept=".txt,.md,.json,.pdf,.docx,text/plain,application/json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple style="display:none;" />
-      <div id="docs"></div>
-      <div id="error" class="error" style="display:none;"></div>
-    </section>
+        <main>
+            <!-- Input Section -->
+            <section class="panel">
+                <div class="panel-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                    Document Corpus
+                </div>
+                
+                <div class="toolbar">
+                    <button id="addDoc" class="btn-secondary">Add Document</button>
+                    <button id="uploadDocsBtn" class="btn-secondary">Upload Files</button>
+                    <button id="resetDocsBtn" class="btn-secondary">Reset Sample</button>
+                    <button id="analyzeBtn" class="btn-primary">Run Analysis</button>
+                </div>
 
-    <section class="panel" style="margin-top: 14px;">
-      <h2 style="margin-top:0;">Results</h2>
-      <div id="stats" class="stats-grid"></div>
-      <div id="relationsSummary" class="relation-summary"></div>
-      <div id="claims" class="grid"></div>
-    </section>
-  </div>
+                <div id="dropzone" class="dropzone">
+                    <!-- Icon and text injected via JS -->
+                </div>
+                
+                <input id="uploadDocsInput" type="file" multiple style="display:none;" 
+                       accept=".txt,.md,.json,.pdf,.docx,text/plain,application/json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                
+                <div id="docs">
+                    <!-- Document cards injected via JS -->
+                </div>
 
-  <script>
-    const docsContainer = document.getElementById("docs");
-    const statsDiv = document.getElementById("stats");
-    const claimsDiv = document.getElementById("claims");
-    const relationsSummaryDiv = document.getElementById("relationsSummary");
-    const errorDiv = document.getElementById("error");
-    const uploadDocsBtn = document.getElementById("uploadDocsBtn");
-    const uploadDocsInput = document.getElementById("uploadDocsInput");
-    const resetDocsBtn = document.getElementById("resetDocsBtn");
-    const dropzone = document.getElementById("dropzone");
+                <div id="error" style="display:none;"></div>
+            </section>
 
-    function createSnippetList(items) {
-      if (!items || items.length === 0) {
-        return '<div class="empty">None</div>';
-      }
-      return `<ul>${items.slice(0, 4).map((i) => `<li>${i}</li>`).join("")}</ul>`;
-    }
+            <!-- Results Section -->
+            <section class="panel">
+                <div class="panel-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    Analysis Results
+                </div>
 
-    function addDocumentCard(defaultSource = "", defaultText = "") {
-      const wrapper = document.createElement("div");
-      wrapper.className = "doc";
+                <div id="stats" class="stats-grid">
+                    <!-- Stats cards injected via JS -->
+                </div>
 
-      const head = document.createElement("div");
-      head.className = "doc-head";
+                <div id="relationsSummary" class="relation-summary">
+                    <!-- Summary badges injected via JS -->
+                </div>
 
-      const title = document.createElement("span");
-      title.textContent = `Document ${document.querySelectorAll(".doc").length + 1}`;
+                <div id="claims" class="claims-grid">
+                    <!-- Claim cards injected via JS -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <p>Analysis results will appear here after processing your documents.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
 
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "btn-secondary remove-doc";
-      removeBtn.textContent = "Remove";
+        <footer>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 40px;">
+                Powered by Advanced NLP Pipeline & InsightStream Engine
+            </p>
+        </footer>
+    </div>
 
-      head.appendChild(title);
-      head.appendChild(removeBtn);
-
-      const sourceLabel = document.createElement("label");
-      sourceLabel.textContent = "Source";
-
-      const sourceInput = document.createElement("input");
-      sourceInput.type = "text";
-      sourceInput.className = "source";
-      sourceInput.placeholder = "e.g. News A / Paper B";
-      sourceInput.value = defaultSource;
-
-      const textLabel = document.createElement("label");
-      textLabel.textContent = "Text";
-
-      const textArea = document.createElement("textarea");
-      textArea.className = "text";
-      textArea.placeholder = "Paste document text here";
-      textArea.value = defaultText;
-
-      wrapper.appendChild(head);
-      wrapper.appendChild(sourceLabel);
-      wrapper.appendChild(sourceInput);
-      wrapper.appendChild(textLabel);
-      wrapper.appendChild(textArea);
-
-      docsContainer.appendChild(wrapper);
-      refreshDocHeadings();
-    }
-
-    function refreshDocHeadings() {
-      document.querySelectorAll(".doc").forEach((doc, idx) => {
-        doc.querySelector(".doc-head span").textContent = `Document ${idx + 1}`;
-      });
-    }
-
-    function showError(message) {
-      errorDiv.textContent = message;
-      errorDiv.style.display = "block";
-    }
-
-    function hideError() {
-      errorDiv.textContent = "";
-      errorDiv.style.display = "none";
-    }
-
-    docsContainer.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
-      if (!target.classList.contains("remove-doc")) {
-        return;
-      }
-      const allDocs = document.querySelectorAll(".doc");
-      if (allDocs.length <= 3) {
-        showError("At least 3 documents are required.");
-        return;
-      }
-      const card = target.closest(".doc");
-      if (card) {
-        card.remove();
-        refreshDocHeadings();
-      }
-    });
-
-    function initDefaults() {
-      docsContainer.innerHTML = "";
-      addDocumentCard(
-        "Source A",
-        "The vaccine reduces severe disease in adults. Clinical studies confirm the vaccine reduces severe disease in adult participants."
-      );
-      addDocumentCard("Source B", "The policy reduces national emissions by 20 percent.");
-      addDocumentCard("Source C", "The policy does not reduce national emissions by 20 percent.");
-    }
-
-    async function uploadAndParseFiles(fileList) {
-      const files = Array.from(fileList || []);
-      if (files.length === 0) {
-        return;
-      }
-
-      hideError();
-      const formData = new FormData();
-      files.forEach((file) => formData.append("files", file));
-
-      try {
-        const response = await fetch("/upload-documents", {
-          method: "POST",
-          body: formData
-        });
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload.detail || "Upload failed.");
-        }
-
-        const docs = payload.documents || [];
-        if (docs.length === 0) {
-          showError("No readable content found in selected files.");
-          return;
-        }
-        docs.forEach((doc) => addDocumentCard(doc.source || "Uploaded Source", doc.text || ""));
-      } catch (error) {
-        showError(error.message || "Upload failed.");
-      }
-    }
-
-    document.getElementById("addDoc").addEventListener("click", () => {
-      addDocumentCard();
-      hideError();
-    });
-
-    uploadDocsBtn.addEventListener("click", () => {
-      uploadDocsInput.click();
-    });
-
-    uploadDocsInput.addEventListener("change", async (event) => {
-      await uploadAndParseFiles(event.target.files);
-      uploadDocsInput.value = "";
-    });
-
-    ["dragenter", "dragover"].forEach((eventName) => {
-      dropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        dropzone.classList.add("active");
-      });
-    });
-
-    ["dragleave", "drop"].forEach((eventName) => {
-      dropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        dropzone.classList.remove("active");
-      });
-    });
-
-    dropzone.addEventListener("drop", async (event) => {
-      const files = event.dataTransfer ? event.dataTransfer.files : null;
-      await uploadAndParseFiles(files);
-    });
-
-    dropzone.addEventListener("click", () => {
-      uploadDocsInput.click();
-    });
-
-    resetDocsBtn.addEventListener("click", () => {
-      hideError();
-      initDefaults();
-      statsDiv.innerHTML = "";
-      relationsSummaryDiv.innerHTML = "";
-      claimsDiv.innerHTML = "";
-    });
-
-    initDefaults();
-
-    document.getElementById("analyzeBtn").addEventListener("click", async () => {
-      hideError();
-      const docs = [...document.querySelectorAll(".doc")].map((el) => ({
-        source: el.querySelector(".source").value.trim(),
-        text: el.querySelector(".text").value.trim()
-      })).filter((d) => d.source && d.text);
-
-      if (docs.length < 3) {
-        showError("Please provide at least 3 complete documents (source + text).");
-        return;
-      }
-
-      statsDiv.innerHTML = '<div class="stat"><div class="k">Status</div><div class="v">Running...</div></div>';
-      claimsDiv.innerHTML = "";
-      relationsSummaryDiv.innerHTML = "";
-
-      try {
-        const response = await fetch("/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ documents: docs })
-        });
-        if (!response.ok) {
-          const msg = await response.text();
-          throw new Error(msg || "Request failed.");
-        }
-        const result = await response.json();
-        renderResult(result);
-      } catch (err) {
-        showError(`Analysis failed: ${err.message}`);
-      }
-    });
-
-    function renderResult(result) {
-      const stats = result.stats || {};
-      const relations = result.relations || [];
-      const entailmentCount = relations.filter((r) => r.label === "entailment").length;
-      const contradictionCount = relations.filter((r) => r.label === "contradiction").length;
-
-      statsDiv.innerHTML = `
-        <div class="stat"><div class="k">Documents</div><div class="v">${stats.document_count || 0}</div></div>
-        <div class="stat"><div class="k">Sentences</div><div class="v">${stats.sentence_count || 0}</div></div>
-        <div class="stat"><div class="k">Claims</div><div class="v">${stats.claim_count || 0}</div></div>
-        <div class="stat"><div class="k">Relations</div><div class="v">${stats.relation_count || 0}</div></div>
-        <div class="stat"><div class="k">Clusters</div><div class="v">${stats.cluster_count || 0}</div></div>
-      `;
-
-      relationsSummaryDiv.innerHTML = `
-        <span class="badge badge-ent">Agreements: ${entailmentCount}</span>
-        <span class="badge badge-con">Contradictions: ${contradictionCount}</span>
-      `;
-
-      claimsDiv.innerHTML = "";
-      const sortedClaims = [...(result.claims || [])].sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
-
-      sortedClaims.forEach((claim) => {
-        const confidence = Number(claim.confidence || 0);
-        const confidencePct = Math.max(0, Math.min(100, Math.round(confidence * 100)));
-        const card = document.createElement("article");
-        card.className = "claim";
-        card.innerHTML = `
-          <p class="claim-text">${claim.text}</p>
-          <div class="meta">Source: ${claim.source}</div>
-          <div class="meta">Cluster: ${claim.cluster_id} | Support: ${claim.support_count} | Contradictions: ${claim.contradiction_count}</div>
-          <div class="meta">Confidence: ${confidence.toFixed(3)} (${confidencePct}%)</div>
-          <div class="bar"><div class="fill" style="width:${confidencePct}%;"></div></div>
-          <details>
-            <summary>Supporting snippets</summary>
-            ${createSnippetList(claim.supporting_snippets)}
-          </details>
-          <details>
-            <summary>Contradicting snippets</summary>
-            ${createSnippetList(claim.contradicting_snippets)}
-          </details>
-        `;
-        claimsDiv.appendChild(card);
-      });
-
-      if (sortedClaims.length === 0) {
-        claimsDiv.innerHTML = '<div class="empty">No claims extracted from the input.</div>';
-      }
-    }
-  </script>
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
 </body>
 </html>
