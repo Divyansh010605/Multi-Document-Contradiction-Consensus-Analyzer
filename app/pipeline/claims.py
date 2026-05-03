@@ -22,27 +22,13 @@ class Claim(BaseModel):
 
 
 _CLAIM_VERBS = {
-    "is",
-    "are",
-    "was",
-    "were",
-    "has",
-    "have",
-    "had",
-    "can",
-    "could",
-    "will",
-    "would",
-    "should",
-    "did",
-    "does",
-    "do",
-    "increased",
-    "decreased",
-    "causes",
-    "prevents",
-    "reduces",
-    "improves",
+    "is", "are", "was", "were", "has", "have", "had", "can", "could", "will", "would", "should", "did", "does", "do",
+    "increased", "decreased", "causes", "prevents", "reduces", "improves", "increases", "decrease", "increase",
+    "lower", "lowers", "lowered", "provide", "provides", "provided", "confirm", "confirms", "confirmed",
+    "indicate", "indicates", "indicated", "show", "shows", "showed", "suggest", "suggests", "suggested",
+    "lead", "leads", "led", "cause", "caused", "prevent", "prevented", "reduce", "reduced",
+    "improve", "improved", "affect", "affects", "affected", "impact", "impacts", "impacted",
+    "trigger", "triggers", "triggered"
 }
 _NORMALIZE_RE = re.compile(r"[^a-z0-9\s]")
 

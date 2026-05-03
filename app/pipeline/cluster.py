@@ -17,7 +17,7 @@ def embed_claims(claims: List[Claim]) -> Tuple[np.ndarray, np.ndarray]:
     if not claims:
         return np.array([]), np.array([])
     texts = [claim.normalized_text for claim in claims]
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
+    vectorizer = TfidfVectorizer(ngram_range=(1, 1), min_df=1, use_idf=False, stop_words="english")
     vectors = vectorizer.fit_transform(texts).toarray()
     similarity = cosine_similarity(vectors)
     return vectors, similarity
@@ -25,7 +25,7 @@ def embed_claims(claims: List[Claim]) -> Tuple[np.ndarray, np.ndarray]:
 
 def cluster_claims(
     claims: List[Claim],
-    similarity_threshold: float = 0.35,
+    similarity_threshold: float = 0.15,
     *,
     vectors: Optional[np.ndarray] = None,
 ) -> Dict[str, int]:

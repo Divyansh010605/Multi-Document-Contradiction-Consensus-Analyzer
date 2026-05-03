@@ -41,9 +41,30 @@ def _negation_mismatch(a: str, b: str) -> bool:
 
 
 def _numeric_conflict(a: str, b: str) -> bool:
-    a_nums = _NUM_RE.findall(a)
-    b_nums = _NUM_RE.findall(b)
-    return bool(a_nums and b_nums and a_nums != b_nums)
+    a_nums = set(_NUM_RE.findall(a))
+    b_nums = set(_NUM_RE.findall(b))
+    return bool(a_nums and b_nums and a_nums.isdisjoint(b_nums))
+
+
+_ANTONYMS = {
+    ("increase", "decrease"),
+    ("increases", "decreases"),
+    ("increased", "decreased"),
+    ("lowers", "increases"),
+    ("lower", "increase"),
+    ("good", "bad"),
+    ("protective", "detrimental"),
+    ("positive", "negative"),
+    ("benefits", "detrimental"),
+}
+
+def _antonym_conflict(a: str, b: str) -> bool:
+    a_tokens = _token_set(a)
+    b_tokens = _token_set(b)
+    for w1, w2 in _ANTONYMS:
+        if (w1 in a_tokens and w2 in b_tokens) or (w2 in a_tokens and w1 in b_tokens):
+            return True
+    return False
 
 
 def infer_relations(
@@ -80,13 +101,15 @@ def infer_relations(
                 continue
 
             pair_similarity = float(sim[i, j])
-            contradiction = _negation_mismatch(claim_a.text, claim_b.text) or _numeric_conflict(
-                claim_a.text, claim_b.text
+            contradiction = (
+                _negation_mismatch(claim_a.text, claim_b.text)
+                or _numeric_conflict(claim_a.text, claim_b.text)
+                or _antonym_conflict(claim_a.text, claim_b.text)
             )
-            if pair_similarity >= 0.55 and contradiction:
+            if pair_similarity >= 0.15 and contradiction:
                 label: Label = "contradiction"
                 confidence = min(1.0, 0.6 + pair_similarity * 0.35)
-            elif pair_similarity >= 0.5:
+            elif pair_similarity >= 0.25:
                 label = "entailment"
                 confidence = min(1.0, 0.5 + pair_similarity * 0.45)
             else:
